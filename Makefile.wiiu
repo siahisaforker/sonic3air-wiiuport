@@ -11,14 +11,15 @@ include $(DEVKITPRO)/wut/share/wut_rules
 CXXFLAGS_ALL = $(shell $(PKGCONFIG) --cflags --static sdl2 vorbisfile vorbis) $(CXXFLAGS) \
                $(MACHDEP) -g -ffunction-sections -fdata-sections \
                -DBASE_PATH='"$(BASE_PATH)"' \
+               -DSTBI_NO_THREAD_LOCALS \
                -IRSDKv4/ \
                -IRSDKv4/NativeObjects/ \
                -Idependencies/all/asio/include/ \
                -Idependencies/all/stb-image/ \
                -Idependencies/all/tinyxml2/
 
-LDFLAGS_ALL = $(LDFLAGS) $(ARCH) $(RPXSPECS)
-LIBS_ALL = $(shell $(PKGCONFIG) --libs --static sdl2 vorbisfile vorbis) $(LIBS)
+LDFLAGS += $(ARCH) $(RPXSPECS)
+LIBS = $(shell $(PKGCONFIG) --libs --static sdl2 vorbisfile vorbis)
 
 SOURCES = \
           dependencies/all/tinyxml2/tinyxml2.cpp \
@@ -90,15 +91,18 @@ ifneq ($(FORCE_CASE_INSENSITIVE),)
 	SOURCES += RSDKv4/fcaseopen.c
 endif
 
+OFILES = $(SOURCES:%=objects/%.o)
+LD = $(CXX)
+
 all: bin/RSDKv4.rpx
+bin/RSDKv4.elf: $(OFILES) bin
+
+bin:
+	mkdir -p bin
 
 objects/%.o: %
 	mkdir -p $(@D)
 	$(CXX) $(CXXFLAGS_ALL) -std=c++17 $^ -o $@ -c
-
-bin/RSDKv4.elf: $(SOURCES:%=objects/%.o)
-	mkdir -p $(@D)
-	$(CXX) $(CXXFLAGS_ALL) $(LDFLAGS_ALL) $^ -o $@ $(LIBS_ALL)
 
 install: bin/RSDKv4
 	install -Dp -m755 bin/RSDKv4 $(prefix)/bin/RSDKv4
