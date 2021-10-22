@@ -9,7 +9,9 @@ PKGCONFIG ?= $(DEVKITPRO)/portlibs/wiiu/bin/powerpc-eabi-pkg-config
 include $(DEVKITPRO)/wut/share/wut_rules
 
 CXXFLAGS_ALL = $(shell $(PKGCONFIG) --cflags --static sdl2 vorbisfile vorbis) $(CXXFLAGS) \
-               $(MACHDEP) -g -ffunction-sections -fdata-sections \
+               $(MACHDEP) -O2 -g -ffunction-sections -fdata-sections \
+               -D__WIIU__ -D__WUT__ \
+               -I$(WUT_ROOT)/include \
                -DBASE_PATH='"$(BASE_PATH)"' \
                -DSTBI_NO_THREAD_LOCALS \
                -IRSDKv4/ \
