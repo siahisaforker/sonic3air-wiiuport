@@ -903,7 +903,7 @@ void Connect2PVS(int *gameLength, int *itemMode)
     matchValueData[1]      = 0;
     matchValueReadPos      = 0;
     matchValueWritePos     = 0;
-    Engine.gameMode        = ENGINE_CONNECT2PVS;
+    //Engine.gameMode        = ENGINE_CONNECT2PVS;
     // PauseSound();
     // actual connection code
     vsGameLength = *gameLength;
@@ -1032,7 +1032,7 @@ void receive2PVSMatchCode(int code)
     CREATE_ENTITY(RetroGameLoop); // hack
     if (Engine.gameDeviceType == RETRO_MOBILE)
         CREATE_ENTITY(VirtualDPad);
-    CREATE_ENTITY(MultiplayerHandler);
+    //CREATE_ENTITY(MultiplayerHandler);
 }
 
 void ShowPromoPopup(int *id, const char *popupName) { printLog("Attempting to show promo popup: \"%s\" (%d)", popupName, id ? *id : 0); }
