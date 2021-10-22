@@ -37,6 +37,7 @@ typedef unsigned int uint;
 #define RETRO_WP7      (6)
 // Custom Platforms start here
 #define RETRO_UWP (7)
+#define RETRO_WIIU (0xCAFE)
 
 // Platform types (Game manages platform-specific code such as HUD position using this rather than the above)
 #define RETRO_STANDARD (0)
@@ -71,6 +72,9 @@ typedef unsigned int uint;
 #define RETRO_PLATFORM   (RETRO_ANDROID)
 #define RETRO_DEVICETYPE (RETRO_MOBILE)
 #include <jni.h>
+#elif defined __WIIU__
+#define RETRO_PLATFORM (RETRO_WIIU)
+#define RETRO_DEVICETYPE (RETRO_STANDARD)
 #else
 //#error "No Platform was defined"
 #define RETRO_PLATFORM   (RETRO_WIN)
@@ -86,7 +90,7 @@ typedef unsigned int uint;
 #define BASE_PATH ""
 #endif
 
-#if RETRO_PLATFORM == RETRO_WIN || RETRO_PLATFORM == RETRO_OSX || RETRO_PLATFORM == RETRO_UWP || RETRO_PLATFORM == RETRO_ANDROID
+#if RETRO_PLATFORM == RETRO_WIN || RETRO_PLATFORM == RETRO_OSX || RETRO_PLATFORM == RETRO_UWP || RETRO_PLATFORM == RETRO_ANDROID || RETRO_PLATFORM == RETRO_WIIU
 #define RETRO_USING_SDL1 (0)
 #define RETRO_USING_SDL2 (1)
 #else // Since its an else & not an elif these platforms probably aren't supported yet
@@ -114,9 +118,8 @@ typedef unsigned int uint;
 #ifdef USE_HW_REN
 #undef RETRO_RENDERTYPE
 #define RETRO_RENDERTYPE (RETRO_HW_RENDER)
-#endif
-
 #define RETRO_USING_OPENGL (1)
+#endif
 
 #define RETRO_SOFTWARE_RENDER (RETRO_RENDERTYPE == RETRO_SW_RENDER)
 //#define RETRO_HARDWARE_RENDER (RETRO_RENDERTYPE == RETRO_HW_RENDER)
