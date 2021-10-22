@@ -1,38 +1,17 @@
 #ifndef READER_H
 #define READER_H
 
-#ifdef FORCE_CASE_INSENSITIVE
-
-#include "fcaseopen.h"
 #define FileIO                                          FILE
-#define fOpen(path, mode)                               fcaseopen(path, mode)
+static inline FileIO* fOpen(const char * pathname, const char * mode) {
+  FileIO* f = fopen(pathname, mode);
+  if (f) setvbuf(f, NULL, _IOFBF, 128*1024);
+  return f;
+}
 #define fRead(buffer, elementSize, elementCount, file)  fread(buffer, elementSize, elementCount, file)
 #define fSeek(file, offset, whence)                     fseek(file, offset, whence)
 #define fTell(file)                                     ftell(file)
 #define fClose(file)                                    fclose(file)
 #define fWrite(buffer, elementSize, elementCount, file) fwrite(buffer, elementSize, elementCount, file)
-
-#else
-
-#if RETRO_USING_SDL1 || RETRO_USING_SDL2
-#define FileIO                                          SDL_RWops
-#define fOpen(path, mode)                               SDL_RWFromFile(path, mode)
-#define fRead(buffer, elementSize, elementCount, file)  SDL_RWread(file, buffer, elementSize, elementCount)
-#define fSeek(file, offset, whence)                     SDL_RWseek(file, offset, whence)
-#define fTell(file)                                     SDL_RWtell(file)
-#define fClose(file)                                    SDL_RWclose(file)
-#define fWrite(buffer, elementSize, elementCount, file) SDL_RWwrite(file, buffer, elementSize, elementCount)
-#else
-#define FileIO                                          FILE
-#define fOpen(path, mode)                               fopen(path, mode)
-#define fRead(buffer, elementSize, elementCount, file)  fread(buffer, elementSize, elementCount, file)
-#define fSeek(file, offset, whence)                     fseek(file, offset, whence)
-#define fTell(file)                                     ftell(file)
-#define fClose(file)                                    fclose(file)
-#define fWrite(buffer, elementSize, elementCount, file) fwrite(buffer, elementSize, elementCount, file)
-#endif
-
-#endif
 
 #define RETRO_PACKFILE_COUNT (0x1000)
 #define RETRO_PACK_COUNT     (0x4)
@@ -93,6 +72,7 @@ extern byte encryptionStringA[0x10];
 extern byte encryptionStringB[0x10];
 
 extern FileIO *cFileHandle;
+extern bool cFileHandleCanClose;
 
 inline void CopyFilePath(char *dest, const char *src)
 {
@@ -124,7 +104,7 @@ bool LoadFile(const char *filePath, FileInfo *fileInfo);
 inline bool CloseFile()
 {
     int result = 0;
-    if (cFileHandle)
+    if (cFileHandle && cFileHandleCanClose)
         result = fClose(cFileHandle);
 
     cFileHandle = NULL;

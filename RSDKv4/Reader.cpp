@@ -20,7 +20,14 @@ byte eNybbleSwap;
 byte encryptionStringA[0x10];
 byte encryptionStringB[0x10];
 
+typedef struct {
+  FileIO* fileHandle;
+  int fileSize;
+} CacheFileHandle;
+static CacheFileHandle cHandles[255] = { 0 };
+
 FileIO *cFileHandle = nullptr;
+bool cFileHandleCanClose = false;
 
 bool CheckRSDKFile(const char *filePath)
 {
@@ -35,6 +42,7 @@ bool CheckRSDKFile(const char *filePath)
 #endif
 
     cFileHandle = fOpen(filePathBuffer, "rb");
+    cFileHandleCanClose = true;
     if (cFileHandle) {
         byte signature[6] = { 'R', 'S', 'D', 'K', 'v', 'B' };
         byte buf          = 0;
@@ -129,7 +137,7 @@ bool LoadFile(const char *filePath, FileInfo *fileInfo)
 {
     MEM_ZEROP(fileInfo);
 
-    if (cFileHandle)
+    if (cFileHandle && cFileHandleCanClose)
         fClose(cFileHandle);
 
     char filePathBuf[0x100];
@@ -200,9 +208,14 @@ bool LoadFile(const char *filePath, FileInfo *fileInfo)
                 continue;
 
             packID      = file->packID;
-            cFileHandle = fOpen(rsdkContainer.packNames[file->packID], "rb");
-            fSeek(cFileHandle, 0, SEEK_END);
-            fileSize = (int)fTell(cFileHandle);
+            if (!cHandles[packID].fileHandle) {
+              cHandles[packID].fileHandle = fOpen(rsdkContainer.packNames[packID], "rb");
+              fSeek(cHandles[packID].fileHandle, 0, SEEK_END);
+              cHandles[packID].fileSize = (int)fTell(cHandles[packID].fileHandle);
+            }
+            cFileHandle = cHandles[packID].fileHandle;
+            cFileHandleCanClose = false;
+            fileSize = cHandles[packID].fileSize;
 
             vFileSize         = file->filesize;
             virtualFileOffset = file->offset;
@@ -252,6 +265,7 @@ bool LoadFile(const char *filePath, FileInfo *fileInfo)
         StrCopy(fileName, fileInfo->fileName);
 
         cFileHandle = fOpen(fileInfo->fileName, "rb");
+        cFileHandleCanClose = true;
         if (!cFileHandle) {
             printLog("Couldn't load file '%s'", filePath);
             return false;
@@ -473,11 +487,18 @@ void SetFileInfo(FileInfo *fileInfo)
 #else
     if (Engine.usingDataFile) {
 #endif
-        cFileHandle       = fOpen(rsdkContainer.packNames[fileInfo->packID], "rb");
+        packID               = fileInfo->packID;
+        if (!cHandles[packID].fileHandle) {
+          cHandles[packID].fileHandle = fOpen(rsdkContainer.packNames[packID], "rb");
+          fSeek(cHandles[packID].fileHandle, 0, SEEK_END);
+          cHandles[packID].fileSize = (int)fTell(cHandles[packID].fileHandle);
+        }
+        cFileHandle = cHandles[packID].fileHandle;
+        cFileHandleCanClose = false;
+        fileSize = cHandles[packID].fileSize;
+
         virtualFileOffset = fileInfo->virtualFileOffset;
         vFileSize         = fileInfo->vfileSize;
-        fSeek(cFileHandle, 0, SEEK_END);
-        fileSize = (int)fTell(cFileHandle);
         readPos  = fileInfo->readPos;
         fSeek(cFileHandle, readPos, SEEK_SET);
         FillFileBuffer();
@@ -487,9 +508,8 @@ void SetFileInfo(FileInfo *fileInfo)
         eStringNo            = fileInfo->eStringNo;
         eNybbleSwap          = fileInfo->eNybbleSwap;
         useEncryption        = fileInfo->useEncryption;
-        packID               = fileInfo->packID;
-        Engine.usingDataFile = fileInfo->usingDataPack;
 
+        Engine.usingDataFile = fileInfo->usingDataPack;
         if (useEncryption) {
             GenerateELoadKeys(vFileSize, (vFileSize >> 1) + 1);
         }
