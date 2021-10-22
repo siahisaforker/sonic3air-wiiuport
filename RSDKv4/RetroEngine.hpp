@@ -278,6 +278,7 @@ extern bool engineDebugMode;
 #include "Renderer.hpp"
 #include "Userdata.hpp"
 #include "Debug.hpp"
+#include "Endian.hpp"
 #if RETRO_USE_MOD_LOADER
 #include "ModAPI.hpp"
 #endif
