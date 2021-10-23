@@ -3,18 +3,18 @@ RUN wget https://github.com/devkitPro/wut/archive/9174f415ed2124a0aaaf9754c14ef6
 RUN cd wut-* && make -j$(nproc) install DESTDIR=/wut-out
 
 #TODO why does this not have input?
-#FROM devkitpro/devkitppc:20210726 AS sdl-build
-#COPY --from=wut-build /wut-out/ /
+FROM devkitpro/devkitppc:20210726 AS sdl-build
+COPY --from=wut-build /wut-out/ /
 
-#RUN wget https://github.com/yawut/SDL/archive/d516577d4feb348fb01900811eb9de6cbb014b94.zip -O sdl.zip && unzip sdl.zip && rm sdl.zip
-#RUN cd SDL-* && mkdir build && cd build && \
-#  cmake .. -DCMAKE_TOOLCHAIN_FILE=/opt/devkitpro/wut/share/wut.toolchain.cmake \
-#  -DCMAKE_INSTALL_PREFIX=/opt/devkitpro/portlibs/wiiu && \
-#  make -j$(nproc) install DESTDIR=/sdl-out
+RUN wget https://github.com/yawut/SDL/archive/81eba84eb9cf213e4a4341727f436562270c8e08.zip -O sdl.zip && unzip sdl.zip && rm sdl.zip
+RUN cd SDL-* && mkdir build && cd build && \
+  cmake .. -DCMAKE_TOOLCHAIN_FILE=/opt/devkitpro/wut/share/wut.toolchain.cmake \
+  -DCMAKE_INSTALL_PREFIX=/opt/devkitpro/portlibs/wiiu && \
+  make -j$(nproc) install DESTDIR=/sdl-out
 
 FROM devkitpro/devkitppc:20210726
 COPY --from=wut-build /wut-out/ /
-#COPY --from=sdl-build /sdl-out/ /
+COPY --from=sdl-build /sdl-out/ /
 
 WORKDIR /app
 CMD make -f Makefile.wiiu -j$(nproc)
