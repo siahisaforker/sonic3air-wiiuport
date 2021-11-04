@@ -23,7 +23,7 @@ container-build:
 sonic1-build:
     stage: build
     script:
-    - make -f Makefile.wiiu BASE_PATH="sd:/wiiu/apps/sonic1/" -j$(nproc)
+    - make -f Makefile.wiiu BASE_PATH="fs:/vol/external01/wiiu/apps/sonic1/" -j$(nproc)
     artifacts:
         paths:
         - bin/RSDKv4.rpx
@@ -32,7 +32,7 @@ sonic1-build:
 sonic2-build:
     stage: build
     script:
-    - make -f Makefile.wiiu BASE_PATH="sd:/wiiu/apps/sonic2/" -j$(nproc)
+    - make -f Makefile.wiiu BASE_PATH="fs:/vol/external01/wiiu/apps/sonic2/" -j$(nproc)
     artifacts:
         paths:
         - bin/RSDKv4.rpx
