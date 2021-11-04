@@ -18,3 +18,5 @@ COPY --from=sdl-build /sdl-out/ /
 
 WORKDIR /app
 CMD make -f Makefile.wiiu -j$(nproc)
+
+# Number of times I regret putting only:changes:Dockerfile in the CI config: 1
