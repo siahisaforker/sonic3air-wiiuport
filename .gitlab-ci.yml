@@ -1,4 +1,4 @@
-image: registry.gitlab.com/QuarkTheAwesome/sonic2013-wiiu/ci
+image: registry.gitlab.com/quarktheawesome/sonic2013-wiiu/ci
 
 stages:
     - container
@@ -17,10 +17,19 @@ container-build:
         changes:
             - Dockerfile.wiiu
 
-sonic-build:
+sonic1-build:
     stage: build
     script:
-    - make -f Makefile.wiiu -j$(nproc)
+    - make -f Makefile.wiiu BASE_PATH="sd:/wiiu/apps/sonic1/" -j$(nproc)
+    artifacts:
+        paths:
+        - bin/RSDKv4.rpx
+        name: "${CI_JOB_NAME}-${CI_COMMIT_REF_NAME}"
+
+sonic2-build:
+    stage: build
+    script:
+    - make -f Makefile.wiiu BASE_PATH="sd:/wiiu/apps/sonic2/" -j$(nproc)
     artifacts:
         paths:
         - bin/RSDKv4.rpx
