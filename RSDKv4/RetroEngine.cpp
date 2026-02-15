@@ -10,7 +10,7 @@ bool engineDebugMode = false;
 #endif
 
 #if RETRO_PLATFORM == RETRO_WIIU
-#include <whb/proc.h>
+#include "Platform/WiiUProc.hpp"
 #endif
 
 RetroEngine Engine = RetroEngine();
@@ -271,6 +271,7 @@ void RetroEngine::Init()
     WHBLogCafeInit();
     devoptab_list[STD_OUT] = &dotab_stdout;
     devoptab_list[STD_ERR] = &dotab_stdout;
+    WiiU_ProcInit();
 #endif
 
     CalculateTrigAngles();
@@ -477,7 +478,7 @@ void RetroEngine::Run()
     Engine.deltaTime      = 0.0f;
 
 #if RETRO_PLATFORM == RETRO_WIIU
-    while (running && WHBProcIsRunning()) {
+    while (running && WiiU_ProcIsRunning()) {
 #else
     while (running) {
 #endif

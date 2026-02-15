@@ -50,6 +50,8 @@ cmake/
 ![Dd]ependencies/windows-uwp/dependencies.txt
 ![Dd]ependencies/android/dependencies.txt
 ![Dd]ependencies/android/libogg/include/ogg/config_types.h
+[Dd]ependencies/all/asio/**
+out/
 
 # UWP
 **/Generated Files

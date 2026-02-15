@@ -1,5 +1,9 @@
 #include "RetroEngine.hpp"
 
+#if RETRO_PLATFORM == RETRO_WIIU
+#include "Platform/WiiUProc.hpp"
+#endif
+
 int globalVariablesCount;
 int globalVariables[GLOBALVAR_COUNT];
 char globalVariableNames[GLOBALVAR_COUNT][0x20];
@@ -1053,7 +1057,12 @@ void ShowWebsite(int websiteID)
     }
 }
 
-void ExitGame() { Engine.running = false; }
+void ExitGame() {
+    Engine.running = false;
+#if RETRO_PLATFORM == RETRO_WIIU
+    WiiU_ProcShutdown();
+#endif
+}
 
 void FileExists(int *unused, const char *filePath)
 {
