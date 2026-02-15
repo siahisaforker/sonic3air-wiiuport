@@ -14,9 +14,7 @@ This repository is a fork of https://gitlab.com/QuarkTheAwesome/sonic2013-wiiu w
 
 2. See the `RSDKv4/` directory for engine sources and platform-specific projects.
 
-## Building
-- Follow the platform Makefiles and project files in the repository root (Windows, UWP, Android, etc.).
-- The `dependencies/` folder contains helper files and third-party support used by the build.
-
 ## License
 This fork follows the original project's license. See the `LICENSE.md` file for details.
+
+TODO: add build instructions
